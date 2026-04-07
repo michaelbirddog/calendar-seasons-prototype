@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Calendar — Hunting Seasons</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#F3F3EF;color:#00003A;min-height:100vh}
+h1{font-family:Impact,sans-serif;text-transform:uppercase;font-size:2rem;color:#00003A;letter-spacing:2px}
+.sub{color:#808285;font-size:.9rem;margin-top:2px}
+.wrap{max-width:1200px;margin:0 auto;padding:24px}
+.hdr{margin-bottom:20px}
+.filters{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{border:1.5px solid #00003A;border-radius:99px;padding:6px 16px;font-size:.85rem;font-weight:500;cursor:pointer;background:#fff;color:#00003A;transition:all .15s}
+.tab.act{background:#00003A;color:#fff}
+.right-ctrl{display:flex;align-items:center;gap:12px}
+.st-sel{display:none;padding:6px 10px;border:1.5px solid #808285;border-radius:8px;font-family:inherit;font-size:.85rem;color:#00003A}
+.st-sel.vis{display:block}
+.tog-wrap{display:flex;align-items:center;gap:8px;font-size:.85rem;color:#58595B;font-weight:500}
+.tog{position:relative;width:44px;height:24px;cursor:pointer}
+.tog input{opacity:0;width:0;height:0}
+.tog-sl{position:absolute;inset:0;background:#ccc;border-radius:99px;transition:.2s}
+.tog-sl:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+.tog input:checked+.tog-sl{background:#FF4B00}
+.tog input:checked+.tog-sl:before{transform:translateX(20px)}
+.legend{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.leg-i{display:flex;align-items:center;gap:6px;font-size:.8rem;color:#58595B}
+.dot{width:10px;height:10px;border-radius:50%}
+.main{display:flex;gap:20px;align-items:flex-start}
+.cal-card{background:#fff;border-radius:16px;padding:20px;flex:1;min-width:0;box-shadow:0 2px 8px rgba(0,0,58,.06)}
+.mnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.mnav h2{font-family:Impact,sans-serif;text-transform:uppercase;font-size:1.3rem;letter-spacing:1px}
+.arr{background:none;border:none;font-size:1.2rem;cursor:pointer;color:#00003A;padding:4px 10px;border-radius:8px;transition:background .15s}
+.arr:hover{background:#F3F3EF}
+.sum-bar{background:#F3F3EF;border-radius:8px;padding:8px 12px;font-size:.8rem;color:#58595B;margin-bottom:10px;display:none}
+.sum-bar.vis{display:block}
+.bands{display:none;margin-bottom:8px}
+.bands.vis{display:block}
+.band-row{position:relative;height:22px;margin-bottom:3px}
+.band-lbl{position:absolute;left:4px;top:2px;font-size:.68rem;font-weight:600;z-index:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px}
+.dow div{text-align:center;font-size:.72rem;font-weight:600;color:#808285;padding:4px 0}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.day{border-radius:8px;min-height:64px;padding:4px;cursor:pointer;transition:background .15s;position:relative;overflow:visible}
+.day:hover{background:#F3F3EF}
+.day.sel{background:#00003A10;outline:2px solid #00003A}
+.day.empty{cursor:default}
+.day.empty:hover{background:transparent}
+.dn{font-size:.8rem;font-weight:500;padding:2px 4px}
+.today .dn{background:#FF4B00;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.ev-chip{font-size:.65rem;background:#4A6FA510;color:#4A6FA5;border-radius:4px;padding:1px 4px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stripes{display:flex;flex-direction:column;gap:1px;margin-bottom:2px}
+.stripe{height:4px;border-radius:2px;cursor:pointer;position:relative}
+.stripe:hover .tt{display:block}
+.tt{display:none;position:absolute;top:-28px;left:0;background:#00003A;color:#fff;font-size:.68rem;padding:3px 7px;border-radius:6px;white-space:nowrap;z-index:50;pointer-events:none}
+.more-st{font-size:.6rem;color:#808285;margin-top:1px}
+.panel{width:280px;background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,58,.06);flex-shrink:0;display:none}
+.panel.vis{display:block}
+.panel h3{font-family:Impact,sans-serif;text-transform:uppercase;font-size:1rem;margin-bottom:12px;color:#00003A}
+.ev-card{border:1px solid #F3F3EF;border-radius:10px;padding:10px;margin-bottom:8px}
+.ev-title{font-weight:600;font-size:.85rem;color:#00003A}
+.ev-meta{font-size:.75rem;color:#808285;margin-top:3px}
+.no-ev{font-size:.85rem;color:#808285;text-align:center;margin-top:20px}
+.popover{position:fixed;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,58,.18);padding:16px;width:260px;z-index:100;display:none}
+.popover.vis{display:block}
+.pop-close{float:right;background:none;border:none;cursor:pointer;font-size:1rem;color:#808285}
+.pop-title{font-weight:700;font-size:.9rem;color:#00003A;margin-bottom:4px}
+.pop-loc{font-size:.75rem;color:#808285;margin-bottom:8px}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:.7rem;font-weight:600}
+.badge.open{background:#00C17E20;color:#00C17E}
+.badge.closing{background:#FFC40020;color:#b08800}
+.badge.closed{background:#80828520;color:#58595B}
+.pop-rows{margin-top:10px}
+.pop-row{display:flex;justify-content:space-between;font-size:.75rem;padding:3px 0;border-bottom:1px solid #F3F3EF}
+.pop-row:last-child{border:none}
+.pop-lnk{display:block;margin-top:10px;font-size:.78rem;color:#FF4B00;font-weight:600;cursor:pointer;text-decoration:none}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,58,.4);z-index:200;display:none;align-items:center;justify-content:center}
+.modal-bg.vis{display:flex}
+.modal{background:#fff;border-radius:16px;width:90%;max-width:700px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column}
+.modal-hdr{padding:20px;border-bottom:1px solid #F3F3EF;display:flex;align-items:center;justify-content:space-between}
+.modal-hdr h2{font-family:Impact,sans-serif;text-transform:uppercase;font-size:1.1rem}
+.modal-close{background:none;border:none;font-size:1.3rem;cursor:pointer;color:#808285}
+.modal-filters{padding:12px 20px;display:flex;gap:10px;flex-wrap:wrap;background:#F3F3EF10;border-bottom:1px solid #F3F3EF}
+.modal-filters select{padding:6px 10px;border:1.5px solid #ccc;border-radius:8px;font-family:inherit;font-size:.8rem}
+.modal-body{overflow-y:auto;padding:0 20px 20px}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.8rem}
+th{text-align:left;padding:8px 6px;color:#808285;font-weight:600;border-bottom:2px solid #F3F3EF;position:sticky;top:0;background:#fff}
+td{padding:8px 6px;border-bottom:1px solid #F3F3EF;vertical-align:middle}
+tr.hide{display:none}
+@media(max-width:768px){
+.filters{flex-direction:column;align-items:flex-start}
+.right-ctrl{width:100%;justify-content:space-between}
+.main{flex-direction:column}
+.panel{width:100%;display:none}
+.panel.vis{display:block}
+.modal{width:100%;max-width:100%;border-radius:0;max-height:100vh;height:100%}
+.modal-bg.vis{align-items:flex-end}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hdr">
+<h1>Calendar</h1>
+<div class="sub">Plan your hunts, bookings & lease activity</div>
+</div>
+<div class="filters">
+<div class="tabs">
+<button class="tab act" onclick="setTab(this)">ALL</button>
+<button class="tab" onclick="setTab(this)">ADVENTURER</button>
+<button class="tab" onclick="setTab(this)">OUTFITTER</button>
+<button class="tab" onclick="setTab(this)">LANDOWNER</button>
+</div>
+<div class="right-ctrl">
+<select class="st-sel" id="stSel"><option value="TX">Texas (TX)</option><option>Oklahoma (OK)</option><option>Colorado (CO)</option><option>Kansas (KS)</option></select>
+<div class="tog-wrap">
+<span>Seasons</span>
+<label class="tog"><input type="checkbox" id="togSeason" onchange="toggleSeasons()"><span class="tog-sl"></span></label>
+</div>
+</div>
+</div>
+<div class="legend">
+<div class="leg-i"><div class="dot" style="background:#FF4B00"></div>Adventure / Trip</div>
+<div class="leg-i"><div class="dot" style="background:#4A6FA5"></div>Booking</div>
+<div class="leg-i"><div class="dot" style="background:#00C17E"></div>Open Season</div>
+</div>
+<div class="main">
+<div class="cal-card">
+<div class="mnav">
+<button class="arr" onclick="changeMonth(-1)">&#8249;</button>
+<h2 id="mTitle"></h2>
+<button class="arr" onclick="changeMonth(1)">&#8250;</button>
+</div>
+<div class="sum-bar" id="sumBar"></div>
+<div class="bands" id="bandsArea"></div>
+<div class="dow"><div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div></div>
+<div class="grid" id="calGrid"></div>
+</div>
+<div class="panel" id="panel">
+<h3 id="panelDate">—</h3>
+<div id="panelBody"></div>
+</div>
+</div>
+</div>
+
+<div class="popover" id="popover">
+<button class="pop-close" onclick="closePop()">✕</button>
+<div id="popContent"></div>
+</div>
+
+<div class="modal-bg" id="modalBg" onclick="closeModal(event)">
+<div class="modal">
+<div class="modal-hdr">
+<h2>Texas Hunting Seasons 2025-2026</h2>
+<button class="modal-close" onclick="closeModalDirect()">✕</button>
+</div>
+<div class="modal-filters">
+<select id="fType" onchange="filterTable()"><option value="">All Types</option><option>Big Game</option><option>Turkey</option><option>Waterfowl</option><option>Upland</option><option>Small Game</option><option>Other</option></select>
+<select id="fWeapon" onchange="filterTable()"><option value="">All Weapons</option><option>Archery</option><option>Rifle</option><option>Shotgun</option><option>Muzzleloader</option><option>Any legal</option><option>Shotgun/Archery</option></select>
+<select id="fStatus" onchange="filterTable()"><option value="">All Status</option><option>Open</option><option>Upcoming</option><option>Closed</option></select>
+</div>
+<div class="modal-body">
+<table id="seasonTable">
+<thead><tr><th>Season</th><th>Type</th><th>Dates</th><th>Weapon</th><th>Limit</th><th>Status</th></tr></thead>
+<tbody id="tBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<script>
+const S=[
+{n:"Turkey - General",w:"Shotgun/Archery",cat:"Turkey",o:"2026-03-15",c:"2026-05-15",l:"4/season",nt:"Gobblers only",st:"open"},
+{n:"Alligator - Regular",w:"Any legal",cat:"Other",o:"2026-04-01",c:"2026-06-30",l:"1/tag",nt:"Tag required",st:"open"},
+{n:"Spring Squirrel",w:"Any legal",cat:"Small Game",o:"2026-04-01",c:"2026-04-15",l:"10/day",nt:"",st:"closing"},
+{n:"Javelina - General",w:"Any legal",cat:"Big Game",o:"2025-09-01",c:"2026-08-31",l:"2/season",nt:"Both sexes",st:"open"},
+{n:"Feral Hog",w:"Any legal",cat:"Other",o:"2026-01-01",c:"2026-12-31",l:"No limit",nt:"No closed season",st:"open"},
+{n:"Deer - Archery",w:"Archery",cat:"Big Game",o:"2025-10-04",c:"2025-11-07",l:"5/season",nt:"",st:"closed"},
+{n:"Deer - General",w:"Rifle",cat:"Big Game",o:"2025-11-08",c:"2026-01-04",l:"5/season",nt:"",st:"closed"},
+{n:"Duck",w:"Shotgun",cat:"Waterfowl",o:"2025-10-25",c:"2026-01-25",l:"6/day",nt:"",st:"closed"},
+{n:"Quail",w:"Any legal",cat:"Upland",o:"2025-10-25",c:"2026-02-28",l:"15/day",nt:"",st:"closed"},
+{n:"Dove - White-winged",w:"Shotgun",cat:"Upland",o:"2025-09-06",c:"2025-09-28",l:"15/day",nt:"",st:"closed"},
+{n:"Mule Deer",w:"Any legal",cat:"Big Game",o:"2025-11-22",c:"2025-12-07",l:"1/season",nt:"",st:"closed"},
+{n:"Eastern Turkey - Youth",w:"Any legal",cat:"Turkey",o:"2026-04-04",c:"2026-04-05",l:"1/season",nt:"Youth only",st:"closed"},
+{n:"Pronghorn",w:"Any legal",cat:"Big Game",o:"2025-09-27",c:"2025-10-12",l:"1/season",nt:"",st:"closed"},
+{n:"Pheasant",w:"Any legal",cat:"Upland",o:"2025-12-06",c:"2026-01-04",l:"3/day",nt:"",st:"closed"},
+{n:"Dove - Mourning",w:"Shotgun",cat:"Upland",o:"2025-09-01",c:"2026-01-25",l:"15/day",nt:"",st:"closed"},
+];
+
+const BC={turkey:"#2E5339",alligator:"#4A6FA5",squirrel:"#FFC400",javelina:"#C4A97D",hog:"#808285"};
+const catKey={turkey:"turkey",other:"alligator",small:"squirrel",big:"javelina"};
+function getBandColor(s){if(s.n.toLowerCase().includes("hog"))return BC.hog;if(s.cat==="Turkey")return BC.turkey;if(s.cat==="Other"&&s.n.toLowerCase().includes("alligator"))return BC.alligator;if(s.cat==="Small Game")return BC.squirrel;if(s.cat==="Big Game"&&s.n.toLowerCase().includes("javelina"))return BC.javelina;return BC.hog;}
+
+const EVTS={
+"2026-04-12":[{t:"Axis Safari",type:"booking"}],
+"2026-04-13":[{t:"Axis Safari",type:"booking"}],
+"2026-04-18":[{t:"Whitetail Hunt",type:"booking"}],
+"2026-04-19":[{t:"Whitetail Hunt",type:"booking"}],
+"2026-04-20":[{t:"Whitetail Hunt",type:"booking"}],
+"2026-04-21":[{t:"Whitetail Hunt",type:"booking"}],
+};
+
+let cur=new Date(2026,3,1);
+let showS=false;
+let selDay=null;
+
+function pad(n){return String(n).padStart(2,'0')}
+function dStr(d){return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
+function parseD(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
+
+function activeSeasonsForDay(d){
+const ds=dStr(d);
+return S.filter(s=>{const o=parseD(s.o),c=parseD(s.c);return d>=o&&d<=c;});
+}
+
+function activeSeasonsForMonth(yr,mo){
+const first=new Date(yr,mo,1),last=new Date(yr,mo+1,0);
+return S.filter(s=>{const o=parseD(s.o),c=parseD(s.c);return o<=last&&c>=first;});
+}
+
+function setTab(el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('act'));el.classList.add('act');}
+
+function toggleSeasons(){
+showS=document.getElementById('togSeason').checked;
+document.getElementById('stSel').classList.toggle('vis',showS);
+document.getElementById('sumBar').classList.toggle('vis',showS);
+document.getElementById('bandsArea').classList.toggle('vis',showS);
+render();
+}
+
+function changeMonth(d){cur=new Date(cur.getFullYear(),cur.getMonth()+d,1);render();}
+
+function render(){
+const yr=cur.getFullYear(),mo=cur.getMonth();
+const mNames=["JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE","JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"];
+document.getElementById('mTitle').textContent=`${mNames[mo]} ${yr}`;
+const first=new Date(yr,mo,1);
+const days=new Date(yr,mo+1,0).getDate();
+const startDow=first.getDay();
+const today=new Date(2026,3,6);
+const actS=activeSeasonsForMonth(yr,mo);
+
+if(showS){
+const sb=document.getElementById('sumBar');
+let txt=`${actS.length} season${actS.length!==1?'s':''} open in TX`;
+const closing=actS.filter(s=>s.st==='closing');
+const recent=actS.filter(s=>{const o=parseD(s.o);const diff=(o-first)/864e5;return diff>=0&&diff<=7;});
+if(closing.length){const s=closing[0];const c=parseD(s.c);txt+=` | ${s.n.split(' ')[0]} closes ${mNames[c.getMonth()].slice(0,3)} ${c.getDate()}`;}
+if(recent.length){const s=recent[0];const o=parseD(s.o);txt+=` | ${s.n.split(' ')[0]} opened ${mNames[o.getMonth()].slice(0,3)} ${o.getDate()}`;}
+sb.textContent=txt;
+
+const ba=document.getElementById('bandsArea');
+ba.innerHTML='';
+const totalDays=startDow+days;
+const totalCells=Math.ceil(totalDays/7)*7;
+actS.forEach(s=>{
+const o=parseD(s.o),c=parseD(s.c);
+const mo1=new Date(yr,mo,1),moLast=new Date(yr,mo+1,0);
+const sStart=o<mo1?mo1:o;
+const sEnd=c>moLast?moLast:c;
+const dayIdx1=sStart.getDate()-1+startDow;
+const dayIdx2=sEnd.getDate()-1+startDow;
+const pct1=(dayIdx1/totalCells)*100;
+const pct2=((dayIdx2+1)/totalCells)*100;
+const bc=getBandColor(s);
+const row=document.createElement('div');
+row.className='band-row';
+row.innerHTML=`<div style="position:absolute;left:${pct1}%;width:${pct2-pct1}%;height:100%;background:${bc};opacity:.12;border-radius:4px;top:0"></div><div class="band-lbl" style="left:calc(${pct1}% + 4px);color:${bc}">${s.n}</div>`;
+ba.appendChild(row);
+});
+}
+
+const grid=document.getElementById('calGrid');
+grid.innerHTML='';
+for(let i=0;i<startDow;i++){const el=document.createElement('div');el.className='day empty';grid.appendChild(el);}
+for(let d=1;d<=days;d++){
+const date=new Date(yr,mo,d);
+const ds=dStr(date);
+const isTod=ds===dStr(today);
+const isSel=selDay===ds;
+const dayS=showS?activeSeasonsForDay(date):[];
+const evs=EVTS[ds]||[];
+const el=document.createElement('div');
+el.className='day'+(isTod?' today':'')+(isSel?' sel':'');
+let html=`<div class="dn">${isTod?`<div class="dn" style="display:flex;justify-content:center"><div style="background:#FF4B00;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem">${d}</div></div>`:d}</div>`;
+if(dayS.length&&showS){
+html+='<div class="stripes">';
+const show=dayS.slice(0,3);
+show.forEach(s=>{
+const col=s.st==='closing'?'#FFC400':'#00C17E';
+html+=`<div class="stripe" style="background:${col}" onclick="showPop(event,'${ds}','${s.n.replace(/'/g,"\\'")}')"><div class="tt">${s.n}</div></div>`;
+});
+if(dayS.length>3)html+=`<div class="more-st">+${dayS.length-3} more</div>`;
+html+='</div>';
+}
+evs.forEach(e=>{html+=`<div class="ev-chip">${e.t}</div>`;});
+el.innerHTML=html;
+el.addEventListener('click',function(ev){if(ev.target.classList.contains('stripe')||ev.target.closest('.stripe'))return;selectDay(ds,d,yr,mo,evs,dayS);});
+grid.appendChild(el);
+}
+}
+
+function selectDay(ds,d,yr,mo,evs,dayS){
+selDay=ds;
+const panel=document.getElementById('panel');
+const mNames=["January","February","March","April","May","June","July","August","September","October","November","December"];
+document.getElementById('panelDate').textContent=`${mNames[mo]} ${d}, ${yr}`;
+let html='';
+if(evs.length===0&&dayS.length===0){html='<div class="no-ev">No events this day</div>';}
+evs.forEach(e=>{html+=`<div class="ev-card"><div class="ev-title">${e.t}</div><div class="ev-meta">Booking · All day</div></div>`;});
+if(showS&&dayS.length){
+dayS.forEach(s=>{
+const bc=`<span class="badge ${s.st}">${s.st==='closing'?'Closing Soon':s.st.charAt(0).toUpperCase()+s.st.slice(1)}</span>`;
+html+=`<div class="ev-card"><div class="ev-title">${s.n} ${bc}</div><div class="ev-meta">${s.o} – ${s.c}<br>Limit: ${s.l} · ${s.w}${s.nt?` · ${s.nt}`:''}</div></div>`;
+});
+}
+document.getElementById('panelBody').innerHTML=html;
+panel.classList.add('vis');
+render();
+}
+
+function showPop(ev,ds,sName){
+ev.stopPropagation();
+const s=S.find(x=>x.n===sName);
+if(!s)return;
+const pop=document.getElementById('popover');
+const bc=`<span class="badge ${s.st}">${s.st==='closing'?'Closing Soon':s.st.charAt(0).toUpperCase()+s.st.slice(1)}</span>`;
+document.getElementById('popContent').innerHTML=`
+<button class="pop-close" onclick="closePop()">✕</button>
+<div class="pop-title">${s.n} ${bc}</div>
+<div class="pop-loc">Texas (Statewide)</div>
+<div class="pop-rows">
+<div class="pop-row"><span>Opens</span><span>${s.o}</span></div>
+<div class="pop-row"><span>Closes</span><span>${s.c}</span></div>
+<div class="pop-row"><span>Bag Limit</span><span>${s.l}</span></div>
+<div class="pop-row"><span>Weapon</span><span>${s.w}</span></div>
+${s.nt?`<div class="pop-row"><span>Notes</span><span>${s.nt}</span></div>`:''}
+</div>
+<a class="pop-lnk" onclick="openModal()">View all TX seasons →</a>`;
+const r=ev.target.getBoundingClientRect();
+pop.style.top=(r.bottom+8+window.scrollY)+'px';
+pop.style.left=Math.min(r.left,window.innerWidth-280)+'px';
+pop.classList.add('vis');
+}
+
+function closePop(){document.getElementById('popover').classList.remove('vis');}
+document.addEventListener('click',function(e){if(!e.target.closest('.stripe')&&!e.target.closest('.popover'))closePop();});
+
+function openModal(){
+closePop();
+buildTable();
+document.getElementById('modalBg').classList.add('vis');
+}
+function closeModal(e){if(e.target===document.getElementById('modalBg'))closeModalDirect();}
+function closeModalDirect(){document.getElementById('modalBg').classList.remove('vis');}
+
+function buildTable(){
+const tb=document.getElementById('tBody');
+tb.innerHTML='';
+S.concat(S).slice(0,15);
+const allS=[...S];
+while(allS.length<15)allS.push(...S);
+const rows=allS.slice(0,15);
+rows.forEach(s=>{
+const bc=s.st==='closing'?'closing':s.st==='open'?'open':'closed';
+const tr=document.createElement('tr');
+tr.dataset.type=s.cat;tr.dataset.weapon=s.w;tr.dataset.status=s.st==='closing'?'Open':s.st.charAt(0).toUpperCase()+s.st.slice(1);
+tr.innerHTML=`<td>${s.n}</td><td>${s.cat}</td><td>${s.o.slice(5)} – ${s.c.slice(5)}</td><td>${s.w}</td><td>${s.l}</td><td><span class="badge ${bc}">${s.st==='closing'?'Closing Soon':s.st.charAt(0).toUpperCase()+s.st.slice(1)}</span></td>`;
+tb.appendChild(tr);
+});
+}
+
+function filterTable(){
+const ty=document.getElementById('fType').value;
+const we=document.getElementById('fWeapon').value;
+const st=document.getElementById('fStatus').value;
+document.querySelectorAll('#tBody tr').forEach(tr=>{
+const show=(!ty||tr.dataset.type===ty)&&(!we||tr.dataset.weapon===we)&&(!st||tr.dataset.status===st);
+tr.classList.toggle('hide',!show);
+});
+}
+
+render();
+</script>
+</body>
+</html>
