@@ -28,7 +28,7 @@ h1{font-family:Impact,sans-serif;text-transform:uppercase;font-size:2rem;color:#
 .leg-i{display:flex;align-items:center;gap:6px;font-size:.8rem;color:#58595B}
 .dot{width:10px;height:10px;border-radius:50%}
 .main{display:flex;gap:20px;align-items:flex-start}
-.cal-card{background:#fff;border-radius:16px;padding:20px;flex:1;min-width:0;box-shadow:0 2px 8px rgba(0,0,58,.06)}
+.cal-card{background:#fff;border-radius:16px;padding:20px;flex:1;min-width:0;box-shadow:0 1px 3px rgba(0,0,58,.04)}
 .mnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .mnav h2{font-family:Impact,sans-serif;text-transform:uppercase;font-size:1.3rem;letter-spacing:1px}
 .arr{background:none;border:none;font-size:1.2rem;cursor:pointer;color:#00003A;padding:4px 10px;border-radius:8px;transition:background .15s}
@@ -49,7 +49,7 @@ h1{font-family:Impact,sans-serif;text-transform:uppercase;font-size:2rem;color:#
 .day.empty{cursor:default}
 .day.empty:hover{background:transparent}
 .dn{font-size:.8rem;font-weight:500;padding:2px 4px}
-.today .dn{background:#FF4B00;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.today .dn{background:#FF4B00;color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem}
 .ev-chip{font-size:.65rem;background:#4A6FA510;color:#4A6FA5;border-radius:4px;padding:1px 4px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .season-dots{display:flex;align-items:center;gap:3px;margin-top:3px;flex-wrap:nowrap;opacity:0;transition:opacity .2s ease}
 .season-dots.loaded{opacity:1}
@@ -57,14 +57,15 @@ h1{font-family:Impact,sans-serif;text-transform:uppercase;font-size:2rem;color:#
 .s-dot:hover .tt{display:block}
 .tt{display:none;position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:#00003A;color:#fff;font-size:.68rem;padding:3px 7px;border-radius:6px;white-space:nowrap;z-index:50;pointer-events:none}
 .more-st{font-size:.58rem;color:#808285;line-height:1;flex-shrink:0}
-.seasons-panel{width:300px;flex-shrink:0;display:none}
-.seasons-panel.vis{display:block}
-.seasons-panel-inner{background:#fff;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,58,.06);overflow:hidden}
+.seasons-panel{width:300px;flex-shrink:0;display:block;transform:translateX(20px);opacity:0;pointer-events:none;transition:transform .25s ease,opacity .25s ease}
+.seasons-panel.vis{transform:translateX(0);opacity:1;pointer-events:auto}
+.seasons-panel-inner{background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,58,.04);overflow:hidden}
 .seasons-panel-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;user-select:none;background:#fff;border-radius:16px 16px 0 0}
 .seasons-panel-hdr h3{font-family:Impact,sans-serif;text-transform:uppercase;font-size:1rem;color:#00003A;letter-spacing:1px;margin:0}
 .seasons-panel-hdr .caret{font-size:1.1rem;color:#00003A;transition:transform .2s;font-weight:700;background:#F3F3EF;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px}
 .seasons-panel-body{padding:0 16px 16px;border-top:1px solid #F3F3EF}
 .seasons-panel-body.hidden{display:none}
+.sp-group-items.hidden{display:none}
 .sp-date-hdr{font-family:Impact,sans-serif;text-transform:uppercase;font-size:.85rem;letter-spacing:1px;color:#00003A;margin:14px 0 10px}
 .sp-item{padding:10px 0;border-bottom:1px solid #F3F3EF}
 .sp-item:last-child{border-bottom:none}
@@ -110,7 +111,6 @@ tr.hide{display:none}
 .right-ctrl{width:100%;justify-content:space-between}
 .main{flex-direction:column}
 .seasons-panel{width:100%}
-.seasons-panel.vis{display:block}
 .modal{width:100%;max-width:100%;border-radius:0;max-height:100vh;height:100%}
 .modal-bg.vis{align-items:flex-end}
 }
@@ -131,7 +131,7 @@ tr.hide{display:none}
 </div>
 <div class="right-ctrl">
 <div class="tog-wrap">
-<span>Seasons</span>
+<span id="togLabel">Seasons</span>
 <label class="tog"><input type="checkbox" id="togSeason" onchange="toggleSeasons()"><span class="tog-sl"></span></label>
 <span class="state-label" id="stateLabel" style="display:none">Texas</span>
 <div style="position:relative">
@@ -268,21 +268,50 @@ document.getElementById('seasonsCaret').textContent=seasonsPanelOpen?'▲':'▼'
 function renderSeasonsPanel(){
 if(!showS)return;
 const yr=cur.getFullYear(),mo=cur.getMonth();
-const mNames=["January","February","March","April","May","June","July","August","September","October","November","December"];
 const MNAMES=["JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE","JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"];
 const actS=activeSeasonsForMonth(yr,mo);
 const dateStr=`${MNAMES[mo]} 1, ${yr}`;
 let html=`<div class="sp-date-hdr">${dateStr}</div>`;
-if(actS.length===0){html+='<div class="no-ev" style="margin-top:8px">No active seasons this month</div>';}
+if(actS.length===0){html+='<div class="no-ev" style="margin-top:8px">No active seasons this month</div>';document.getElementById('seasonsPanelContent').innerHTML=html;return;}
+
+// Group by status
+const open=[],closingSoon=[],upcoming=[],closed=[];
 actS.forEach(s=>{
-const badgeCls=s.st==='closing'?'closing':s.st==='open'?'open':'closed';
-const badgeLabel=s.st==='closing'?'Closing Soon':s.st.charAt(0).toUpperCase()+s.st.slice(1);
-html+=`<div class="sp-item">
-<div class="sp-name">${s.n} <span class="sp-badge ${badgeCls}">${badgeLabel}</span></div>
+if(s.st==='open')open.push(s);
+else if(s.st==='closing')closingSoon.push(s);
+else if(s.st==='upcoming')upcoming.push(s);
+else closed.push(s);
+});
+
+function spItem(s){
+const borderColor=s.st==='open'?'#00C17E':s.st==='closing'?'#FFC400':s.st==='upcoming'?'#4A6FA5':'#808285';
+const statusColor=borderColor;
+let statusLabel=s.st==='open'?'Open':s.st==='closing'?'Closing Soon':s.st==='upcoming'?'Upcoming':'Closed';
+// For closing, try to show close date
+if(s.st==='closing'){const c=parseD(s.c);const mn=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];statusLabel=`Closing ${mn[c.getMonth()]} ${c.getDate()}`;}
+return `<div class="sp-item" style="border-left:3px solid ${borderColor};padding-left:10px">
+<div class="sp-name">${s.n}</div>
+<div style="font-size:.68rem;color:${statusColor};margin-top:1px">${statusLabel}</div>
 <div class="sp-dates">${s.o} – ${s.c}</div>
 <div class="sp-meta">Limit: ${s.l} · ${s.w}${s.nt?` · ${s.nt}`:''}</div>
-</div>`;
-});
+</div>`;}
+
+function spGroup(label,items,collapsed){
+if(items.length===0)return '';
+const hiddenCls=collapsed?' hidden':'';
+return `<div class="sp-group">
+<div class="sp-group-hdr" onclick="this.nextElementSibling.classList.toggle('hidden');this.querySelector('.gi').textContent=this.nextElementSibling.classList.contains('hidden')?'▸':'▾'" style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 0;border-bottom:1px solid #F3F3EF">
+<span class="gi" style="font-size:.7rem;color:#808285">${collapsed?'▸':'▾'}</span>
+<span style="font-size:.68rem;font-weight:600;color:#58595B;text-transform:uppercase;letter-spacing:.05em">${label} (${items.length})</span>
+</div>
+<div class="sp-group-items${hiddenCls}">${items.map(spItem).join('')}</div>
+</div>`;}
+
+html+=spGroup('Open Now',open,false);
+html+=spGroup('Closing Soon',closingSoon,false);
+html+=spGroup('Upcoming',upcoming,true);
+html+=spGroup('Closed',closed,true);
+
 document.getElementById('seasonsPanelContent').innerHTML=html;
 }
 
@@ -316,6 +345,9 @@ if(closing.length){const s=closing[0];const c=parseD(s.c);txt+=`<br>${s.n.split(
 if(recent.length){const s=recent[0];const o=parseD(s.o);txt+=`<br>${s.n.split(' ')[0]} opened ${mNames[o.getMonth()].slice(0,3)} ${o.getDate()}`;}
 tip.innerHTML=txt;
 }
+// Update toggle label with count
+const activeCount = activeSeasonsForMonth(yr, mo).length;
+document.getElementById('togLabel').textContent = showS ? 'Seasons (' + activeCount + ')' : 'Seasons';
 
 const grid=document.getElementById('calGrid');
 grid.innerHTML='';
