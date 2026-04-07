@@ -62,7 +62,7 @@ h1{font-family:Impact,sans-serif;text-transform:uppercase;font-size:2rem;color:#
 .seasons-panel-inner{background:#fff;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,58,.06);overflow:hidden}
 .seasons-panel-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;user-select:none;background:#fff;border-radius:16px 16px 0 0}
 .seasons-panel-hdr h3{font-family:Impact,sans-serif;text-transform:uppercase;font-size:1rem;color:#00003A;letter-spacing:1px;margin:0}
-.seasons-panel-hdr .caret{font-size:.85rem;color:#808285;transition:transform .2s}
+.seasons-panel-hdr .caret{font-size:1.1rem;color:#00003A;transition:transform .2s;font-weight:700;background:#F3F3EF;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px}
 .seasons-panel-body{padding:0 16px 16px;border-top:1px solid #F3F3EF}
 .seasons-panel-body.hidden{display:none}
 .sp-date-hdr{font-family:Impact,sans-serif;text-transform:uppercase;font-size:.85rem;letter-spacing:1px;color:#00003A;margin:14px 0 10px}
@@ -161,7 +161,7 @@ tr.hide{display:none}
 <div class="seasons-panel-inner">
 <div class="seasons-panel-hdr" onclick="toggleSeasonsPanel()">
 <h3>Hunting Seasons</h3>
-<span class="caret" id="seasonsCaret">▼</span>
+<span class="caret" id="seasonsCaret" title="Collapse / Expand">▼</span>
 </div>
 <div class="seasons-panel-body" id="seasonsPanelBody">
 <div id="seasonsPanelContent"></div>
