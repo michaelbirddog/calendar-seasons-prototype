@@ -16,15 +16,15 @@ h1{font-family:Impact,sans-serif;text-transform:uppercase;font-size:2rem;color:#
 .tab{border:1.5px solid #00003A;border-radius:99px;padding:6px 16px;font-size:.85rem;font-weight:500;cursor:pointer;background:#fff;color:#00003A;transition:all .15s}
 .tab.act{background:#00003A;color:#fff}
 .right-ctrl{display:flex;align-items:center;gap:12px}
-.st-sel{display:none;padding:6px 10px;border:1.5px solid #808285;border-radius:8px;font-family:inherit;font-size:.85rem;color:#00003A}
+.st-sel{display:none;padding:4px 8px;border:1.5px solid #808285;border-radius:8px;font-family:inherit;font-size:.78rem;color:#00003A}
 .st-sel.vis{display:block}
 .tog-wrap{display:flex;align-items:center;gap:8px;font-size:.85rem;color:#58595B;font-weight:500}
-.tog{position:relative;width:44px;height:24px;cursor:pointer}
+.tog{position:relative;width:36px;height:20px;cursor:pointer}
 .tog input{opacity:0;width:0;height:0}
-.tog-sl{position:absolute;inset:0;background:#ccc;border-radius:99px;transition:.2s}
-.tog-sl:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
-.tog input:checked+.tog-sl{background:#FF4B00}
-.tog input:checked+.tog-sl:before{transform:translateX(20px)}
+.tog-sl{position:absolute;inset:0;background:#808285;border-radius:99px;transition:.2s}
+.tog-sl:before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+.tog input:checked+.tog-sl{background:#00C17E}
+.tog input:checked+.tog-sl:before{transform:translateX(16px)}
 .legend{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
 .leg-i{display:flex;align-items:center;gap:6px;font-size:.8rem;color:#58595B}
 .dot{width:10px;height:10px;border-radius:50%}
@@ -34,16 +34,17 @@ h1{font-family:Impact,sans-serif;text-transform:uppercase;font-size:2rem;color:#
 .mnav h2{font-family:Impact,sans-serif;text-transform:uppercase;font-size:1.3rem;letter-spacing:1px}
 .arr{background:none;border:none;font-size:1.2rem;cursor:pointer;color:#00003A;padding:4px 10px;border-radius:8px;transition:background .15s}
 .arr:hover{background:#F3F3EF}
-.sum-bar{background:#F3F3EF;border-radius:8px;padding:8px 12px;font-size:.8rem;color:#58595B;margin-bottom:10px;display:none}
-.sum-bar.vis{display:block}
-.bands{display:none;margin-bottom:8px}
-.bands.vis{display:block}
-.band-row{position:relative;height:22px;margin-bottom:3px}
-.band-lbl{position:absolute;left:4px;top:2px;font-size:.68rem;font-weight:600;z-index:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.sum-bar{display:none}
+.info-btn{display:none;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:1.5px solid #808285;background:none;cursor:pointer;font-size:.75rem;color:#808285;font-weight:700;flex-shrink:0;position:relative;line-height:1;transition:border-color .15s,color .15s}
+.info-btn:hover{border-color:#00003A;color:#00003A}
+.info-btn.vis{display:flex}
+.info-tooltip{display:none;position:absolute;top:calc(100% + 8px);right:0;background:#00003A;color:#fff;font-size:.75rem;padding:8px 12px;border-radius:8px;white-space:nowrap;z-index:60;min-width:220px;line-height:1.5;box-shadow:0 4px 16px rgba(0,0,58,.2)}
+.info-tooltip.vis{display:block}
+.bands{display:none}
 .dow{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px}
 .dow div{text-align:center;font-size:.72rem;font-weight:600;color:#808285;padding:4px 0}
 .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.day{border-radius:8px;min-height:64px;padding:4px;cursor:pointer;transition:background .15s;position:relative;overflow:visible}
+.day{border-radius:8px;min-height:72px;padding:6px;cursor:pointer;transition:background .15s;position:relative;overflow:visible}
 .day:hover{background:#F3F3EF}
 .day.sel{background:#00003A10;outline:2px solid #00003A}
 .day.empty{cursor:default}
@@ -51,11 +52,12 @@ h1{font-family:Impact,sans-serif;text-transform:uppercase;font-size:2rem;color:#
 .dn{font-size:.8rem;font-weight:500;padding:2px 4px}
 .today .dn{background:#FF4B00;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700}
 .ev-chip{font-size:.65rem;background:#4A6FA510;color:#4A6FA5;border-radius:4px;padding:1px 4px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stripes{display:flex;flex-direction:column;gap:1px;margin-bottom:2px}
-.stripe{height:4px;border-radius:2px;cursor:pointer;position:relative}
-.stripe:hover .tt{display:block}
-.tt{display:none;position:absolute;top:-28px;left:0;background:#00003A;color:#fff;font-size:.68rem;padding:3px 7px;border-radius:6px;white-space:nowrap;z-index:50;pointer-events:none}
-.more-st{font-size:.6rem;color:#808285;margin-top:1px}
+.season-dots{display:flex;align-items:center;gap:3px;margin-top:3px;flex-wrap:nowrap;opacity:0;transition:opacity .2s ease}
+.season-dots.loaded{opacity:1}
+.s-dot{width:7px;height:7px;border-radius:50%;cursor:pointer;flex-shrink:0;position:relative}
+.s-dot:hover .tt{display:block}
+.tt{display:none;position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:#00003A;color:#fff;font-size:.68rem;padding:3px 7px;border-radius:6px;white-space:nowrap;z-index:50;pointer-events:none}
+.more-st{font-size:.58rem;color:#808285;line-height:1;flex-shrink:0}
 .panel{width:280px;background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,58,.06);flex-shrink:0;display:none}
 .panel.vis{display:block}
 .panel h3{font-family:Impact,sans-serif;text-transform:uppercase;font-size:1rem;margin-bottom:12px;color:#00003A}
@@ -118,6 +120,10 @@ tr.hide{display:none}
 <div class="tog-wrap">
 <span>Seasons</span>
 <label class="tog"><input type="checkbox" id="togSeason" onchange="toggleSeasons()"><span class="tog-sl"></span></label>
+<div style="position:relative">
+<button class="info-btn" id="infoBtn" onclick="toggleInfoTip(event)" title="Season summary">i</button>
+<div class="info-tooltip" id="infoTip"></div>
+</div>
 </div>
 </div>
 </div>
@@ -133,8 +139,7 @@ tr.hide{display:none}
 <h2 id="mTitle"></h2>
 <button class="arr" onclick="changeMonth(1)">&#8250;</button>
 </div>
-<div class="sum-bar" id="sumBar"></div>
-<div class="bands" id="bandsArea"></div>
+<div id="bandsArea"></div>
 <div class="dow"><div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div></div>
 <div class="grid" id="calGrid"></div>
 </div>
@@ -225,10 +230,19 @@ function setTab(el){document.querySelectorAll('.tab').forEach(t=>t.classList.rem
 function toggleSeasons(){
 showS=document.getElementById('togSeason').checked;
 document.getElementById('stSel').classList.toggle('vis',showS);
-document.getElementById('sumBar').classList.toggle('vis',showS);
-document.getElementById('bandsArea').classList.toggle('vis',showS);
+document.getElementById('infoBtn').classList.toggle('vis',showS);
+if(!showS)document.getElementById('infoTip').classList.remove('vis');
 render();
 }
+
+function toggleInfoTip(e){
+e.stopPropagation();
+document.getElementById('infoTip').classList.toggle('vis');
+}
+document.addEventListener('click',function(e){
+if(!e.target.closest('#infoBtn')&&!e.target.closest('#infoTip'))
+document.getElementById('infoTip').classList.remove('vis');
+});
 
 function changeMonth(d){cur=new Date(cur.getFullYear(),cur.getMonth()+d,1);render();}
 
@@ -243,33 +257,13 @@ const today=new Date(2026,3,6);
 const actS=activeSeasonsForMonth(yr,mo);
 
 if(showS){
-const sb=document.getElementById('sumBar');
+const tip=document.getElementById('infoTip');
 let txt=`${actS.length} season${actS.length!==1?'s':''} open in TX`;
 const closing=actS.filter(s=>s.st==='closing');
 const recent=actS.filter(s=>{const o=parseD(s.o);const diff=(o-first)/864e5;return diff>=0&&diff<=7;});
-if(closing.length){const s=closing[0];const c=parseD(s.c);txt+=` | ${s.n.split(' ')[0]} closes ${mNames[c.getMonth()].slice(0,3)} ${c.getDate()}`;}
-if(recent.length){const s=recent[0];const o=parseD(s.o);txt+=` | ${s.n.split(' ')[0]} opened ${mNames[o.getMonth()].slice(0,3)} ${o.getDate()}`;}
-sb.textContent=txt;
-
-const ba=document.getElementById('bandsArea');
-ba.innerHTML='';
-const totalDays=startDow+days;
-const totalCells=Math.ceil(totalDays/7)*7;
-actS.forEach(s=>{
-const o=parseD(s.o),c=parseD(s.c);
-const mo1=new Date(yr,mo,1),moLast=new Date(yr,mo+1,0);
-const sStart=o<mo1?mo1:o;
-const sEnd=c>moLast?moLast:c;
-const dayIdx1=sStart.getDate()-1+startDow;
-const dayIdx2=sEnd.getDate()-1+startDow;
-const pct1=(dayIdx1/totalCells)*100;
-const pct2=((dayIdx2+1)/totalCells)*100;
-const bc=getBandColor(s);
-const row=document.createElement('div');
-row.className='band-row';
-row.innerHTML=`<div style="position:absolute;left:${pct1}%;width:${pct2-pct1}%;height:100%;background:${bc};opacity:.12;border-radius:4px;top:0"></div><div class="band-lbl" style="left:calc(${pct1}% + 4px);color:${bc}">${s.n}</div>`;
-ba.appendChild(row);
-});
+if(closing.length){const s=closing[0];const c=parseD(s.c);txt+=`<br>${s.n.split(' ')[0]} closes ${mNames[c.getMonth()].slice(0,3)} ${c.getDate()}`;}
+if(recent.length){const s=recent[0];const o=parseD(s.o);txt+=`<br>${s.n.split(' ')[0]} opened ${mNames[o.getMonth()].slice(0,3)} ${o.getDate()}`;}
+tip.innerHTML=txt;
 }
 
 const grid=document.getElementById('calGrid');
@@ -286,19 +280,28 @@ const el=document.createElement('div');
 el.className='day'+(isTod?' today':'')+(isSel?' sel':'');
 let html=`<div class="dn">${isTod?`<div class="dn" style="display:flex;justify-content:center"><div style="background:#FF4B00;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem">${d}</div></div>`:d}</div>`;
 if(dayS.length&&showS){
-html+='<div class="stripes">';
+html+='<div class="season-dots" id="dots-'+ds+'">';
 const show=dayS.slice(0,3);
 show.forEach(s=>{
-const col=s.st==='closing'?'#FFC400':'#00C17E';
-html+=`<div class="stripe" style="background:${col}" onclick="showPop(event,'${ds}','${s.n.replace(/'/g,"\\'")}')"><div class="tt">${s.n}</div></div>`;
+const col=s.st==='closing'?'#FFC400':(s.st==='upcoming'?'#4A6FA5':'#00C17E');
+const sn=s.n.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+html+=`<div class="s-dot" style="background:${col}" onclick="showPop(event,'${ds}','${sn}')"><div class="tt">${s.n}</div></div>`;
 });
-if(dayS.length>3)html+=`<div class="more-st">+${dayS.length-3} more</div>`;
+if(dayS.length>3)html+=`<div class="more-st">+${dayS.length-3}</div>`;
 html+='</div>';
 }
 evs.forEach(e=>{html+=`<div class="ev-chip">${e.t}</div>`;});
 el.innerHTML=html;
-el.addEventListener('click',function(ev){if(ev.target.classList.contains('stripe')||ev.target.closest('.stripe'))return;selectDay(ds,d,yr,mo,evs,dayS);});
+el.addEventListener('click',function(ev){if(ev.target.classList.contains('s-dot')||ev.target.closest('.s-dot'))return;selectDay(ds,d,yr,mo,evs,dayS);});
 grid.appendChild(el);
+}
+// Trigger fade-in for dots
+if(showS){
+requestAnimationFrame(()=>{
+document.querySelectorAll('.season-dots').forEach(d=>{
+requestAnimationFrame(()=>d.classList.add('loaded'));
+});
+});
 }
 }
 
@@ -346,7 +349,7 @@ pop.classList.add('vis');
 }
 
 function closePop(){document.getElementById('popover').classList.remove('vis');}
-document.addEventListener('click',function(e){if(!e.target.closest('.stripe')&&!e.target.closest('.popover'))closePop();});
+document.addEventListener('click',function(e){if(!e.target.closest('.s-dot')&&!e.target.closest('.popover'))closePop();});
 
 function openModal(){
 closePop();
